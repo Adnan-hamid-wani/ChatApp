@@ -50,12 +50,22 @@ chat-app/
 │   └── package.json
 └── README.md     # Project documentation
 
+```
+Usage
+
+Start Chatting: Open the application in multiple browser tabs or devices, join the same chat room, and start exchanging messages in real time.
+
+License
+
+This project is licensed under the MIT License. Feel free to use and modify it as needed.
 
 Acknowledgments
+
 Node.js
+
 React.js
+
 Socket.IO
+
 Vite
-vbnet
-Copy
-Edit
+
