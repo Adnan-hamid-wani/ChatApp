@@ -36,9 +36,9 @@ A real-time chat application built with **Node.js**, **React.js**, **Socket.IO**
 
 ### Steps
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/your-repo/chat-app.git
+## Project Structure
+
+```plaintext
 chat-app/
 ├── frontend/     # Frontend code (React, Vite)
 │   ├── public/   # Static assets
