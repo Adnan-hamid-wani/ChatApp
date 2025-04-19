@@ -38,6 +38,25 @@ function App() {
     const saved = localStorage.getItem('darkMode');
     return saved ? JSON.parse(saved) : false;
   });
+  const [typingUser, setTypingUser] = useState<string | null>(null);
+
+useEffect(() => {
+  socket.on('user_typing', ({ username: typingUsername }) => {
+    if (typingUsername !== username) {
+      setTypingUser(typingUsername);
+    }
+  });
+
+  socket.on('user_stopped_typing', () => {
+    setTypingUser(null);
+  });
+
+  return () => {
+    socket.off('user_typing');
+    socket.off('user_stopped_typing');
+  };
+}, [username]);
+
 
   useEffect(() => {
     if (isDarkMode) {
@@ -159,6 +178,9 @@ function App() {
               currentUser={username}
               onSendMessage={sendMessage}
               searchTerm={searchTerm}
+              typingUser={typingUser}
+              socket={socket}
+              room={room}
             />
           </div>
         </div>

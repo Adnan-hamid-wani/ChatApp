@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Smile, Image, Paperclip, Mic } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { Socket } from 'socket.io-client';
 
 interface Message {
   message: string;
@@ -14,11 +15,15 @@ interface ChatAreaProps {
   currentUser: string;
   onSendMessage: (message: string) => void;
   searchTerm: string;
+  typingUser: string | null;
+  socket: Socket;
+  room: string;
 }
 
-function ChatArea({ messages, currentUser, onSendMessage, searchTerm }: ChatAreaProps) {
+function ChatArea({ messages, currentUser, onSendMessage, searchTerm, typingUser, socket, room }: ChatAreaProps) {
   const [newMessage, setNewMessage] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -46,6 +51,20 @@ function ChatArea({ messages, currentUser, onSendMessage, searchTerm }: ChatArea
         part
     );
   };
+  const typingTimeout = useRef<NodeJS.Timeout | null>(null);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setNewMessage(e.target.value);
+    socket.emit('typing', { username: currentUser, room });
+  
+    if (typingTimeout.current) clearTimeout(typingTimeout.current);
+    typingTimeout.current = setTimeout(() => {
+      socket.emit('stop_typing', { room });
+    }, 1000);
+  };
+  
+  
+  
 
   return (
     <div className="flex-1 flex flex-col bg-[#efeae2] dark:bg-gray-900">
@@ -76,8 +95,16 @@ function ChatArea({ messages, currentUser, onSendMessage, searchTerm }: ChatArea
             </div>
           </motion.div>
         ))}
+        {typingUser && typingUser !== currentUser && (
+  <div className="text-sm text-gray-500 dark:text-gray-300 italic">
+    {typingUser} is typing...
+  </div>
+)}
+
         <div ref={messagesEndRef} />
+        
       </div>
+
 
       <form
         onSubmit={handleSubmit}
@@ -105,7 +132,7 @@ function ChatArea({ messages, currentUser, onSendMessage, searchTerm }: ChatArea
           <input
             type="text"
             value={newMessage}
-            onChange={(e) => setNewMessage(e.target.value)}
+            onChange={handleInputChange}
             placeholder="Type a message..."
             className="flex-1 rounded-full border border-gray-300 dark:border-gray-600 px-4 py-2 focus:outline-none focus:border-emerald-500 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
           />
