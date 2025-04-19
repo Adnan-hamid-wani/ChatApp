@@ -104,6 +104,14 @@ io.on('connection', (socket) => {
       }
     }
   });
+  socket.on('typing', ({ username, room }) => {
+    socket.to(room).emit('user_typing', { username });
+  });
+  
+  socket.on('stop_typing', ({ room }) => {
+    socket.to(room).emit('user_stopped_typing');
+  });
+  
 });
 
 const PORT = process.env.PORT || 3000;
